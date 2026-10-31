@@ -1,0 +1,40 @@
+
+name: Build PHOTO STUDIO APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Extract project
+        run: unzip -q PHOTO_STUDIO_Android_Project_CloudBuild.zip -d extracted
+
+      - name: Build APK
+        run: gradle --no-daemon -p extracted/PHOTO_STUDIO_Android :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: PHOTO-STUDIO-APK
+          path: extracted/PHOTO_STUDIO_Android/app/build/outputs/apk/debug/app-debug.apk
